@@ -1,11 +1,5 @@
-pandas
-numpy
-scikit-learn
-xgboost
-joblib
 streamlit
-altair
-
-
-
-
+pandas>=2.2.0
+numpy>=1.26.0
+scikit-learn
+joblib
