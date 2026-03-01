@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-import altair as alt
+import matplotlib.pyplot as plt
 
 # -------------------------
 # Load saved model and preprocessor
@@ -41,31 +41,32 @@ if uploaded_file is not None:
         results_df['Predicted Price'] = y_pred
         
         st.subheader("Prediction Results")
-        st.dataframe(results_df.head(20))  # Show first 20 rows
+        st.dataframe(results_df.head(20))
 
         # -------------------------
-        # Bar chart visualization
+        # Matplotlib Bar Chart
         # -------------------------
         st.subheader("Actual vs Predicted Price Bar Chart")
-        # Melt dataframe for charting
-        chart_df = results_df[['Actual Price', 'Predicted Price']].reset_index().melt(
-            id_vars='index', value_vars=['Actual Price', 'Predicted Price'],
-            var_name='Price Type', value_name='Price'
-        )
 
-        chart = alt.Chart(chart_df).mark_bar().encode(
-            x=alt.X('index:N', title='Car Index'),
-            y=alt.Y('Price:Q'),
-            color='Price Type:N',
-            tooltip=['index', 'Price Type', 'Price']
-        ).properties(width=800, height=400)
+        fig, ax = plt.subplots(figsize=(12, 6))
 
-        st.altair_chart(chart, use_container_width=True)
+        indices = np.arange(len(y_actual))
+
+        ax.bar(indices - 0.2, y_actual, width=0.4, label='Actual Price')
+        ax.bar(indices + 0.2, y_pred, width=0.4, label='Predicted Price')
+
+        ax.set_xlabel("Car Index")
+        ax.set_ylabel("Price")
+        ax.set_title("Actual vs Predicted Prices")
+        ax.legend()
+
+        st.pyplot(fig)
 
         # -------------------------
         # Metrics
         # -------------------------
         from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
         mae = mean_absolute_error(y_actual, y_pred)
         rmse = np.sqrt(mean_squared_error(y_actual, y_pred))
         r2 = r2_score(y_actual, y_pred)
